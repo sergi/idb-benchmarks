@@ -64,6 +64,7 @@ function generateAll() {
 
 var incrementalBtn = document.getElementById('incremental');
 var contents = document.getElementById('contents');
+var totalTime = document.getElementById('totalTime');
 
 function search(str) {
   var time = Date.now();
@@ -89,7 +90,7 @@ function search(str) {
       }
       cursor.continue();
     } else {
-      console.log('Time spent searching and traversing the whole database:', Date.now() - time + 'ms');
+      totalTime.textContent = Date.now() - time + 'ms';
       document.getElementById('contents').innerHTML += results.join('<br/>');
     }
   };
