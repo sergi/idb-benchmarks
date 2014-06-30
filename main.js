@@ -40,7 +40,6 @@ function generateAll() {
           Faker.Internet.email(),
           Faker.Company.companyName());
 
-          console.log(contact.join(' '))
           customerObjectStore.add({ info: contact.join(' ') });
       }
       console.log(i + ' contacts inserted successfully.');
