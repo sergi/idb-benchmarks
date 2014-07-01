@@ -26,7 +26,7 @@ function generateAll() {
     db = event.target.result;
     var objectStore = db.createObjectStore("contacts", { autoIncrement: true });
 
-    //objectStore.createIndex("info", "info", { unique: false });
+    objectStore.createIndex("info", "info", { unique: false });
 
     objectStore.transaction.oncomplete = function(event) {
       var customerObjectStore = db.transaction("contacts", "readwrite").objectStore("contacts");
@@ -37,9 +37,10 @@ function generateAll() {
           Faker.Name.lastName(),
           Faker.PhoneNumber.phoneNumber(),
           Faker.Internet.email(),
-          Faker.Company.companyName());
+          Faker.Company.companyName()
+        );
 
-          customerObjectStore.add({ info: contact.join(' ') });
+        customerObjectStore.add({ info: contact.join(' ') });
       }
       console.log(i + ' contacts inserted successfully.');
     };
@@ -79,12 +80,15 @@ function search(str) {
     }
   }
 
-  var request = store.openCursor();
+  var index = store.index('info');
+  var request = index.openCursor(IDBKeyRange.lowerBound(0), 'next');
+  //var request = store.openCursor();
   request.onsuccess = function(evt) {
-    var cursor = evt.target.result;
+    //var cursor = evt.target.result;
+    var cursor = request.result;
     if (cursor) {
       if (reStr.test(cursor.value.info)) {
-        appendResult(cursor.value.info)
+        appendResult(cursor.value.info);
       }
       cursor.continue();
     } else {
