@@ -69,7 +69,7 @@ function search(str) {
   var time = Date.now();
 
   var results = [];
-  var reStr = new RegExp(str, 'i');
+  //var reStr = new RegExp(str, 'i');
   var store = db.transaction("contacts").objectStore("contacts");
 
   function appendResult(res) {
@@ -82,12 +82,11 @@ function search(str) {
 
   var index = store.index('info');
   var request = index.openCursor(IDBKeyRange.lowerBound(0), 'next');
-  //var request = store.openCursor();
   request.onsuccess = function(evt) {
-    //var cursor = evt.target.result;
     var cursor = request.result;
     if (cursor) {
-      if (reStr.test(cursor.value.info)) {
+      //if (reStr.test(cursor.value.info)) {
+      if (cursor.value.info.indexOf(str) !== -1) {
         appendResult(cursor.value.info);
       }
       cursor.continue();
