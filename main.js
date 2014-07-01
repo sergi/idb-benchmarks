@@ -26,7 +26,7 @@ function generateAll() {
     db = event.target.result;
     var objectStore = db.createObjectStore("contacts", { autoIncrement: true });
 
-    objectStore.createIndex("info", "info", { unique: false });
+    //objectStore.createIndex("info", "info", { unique: false });
 
     objectStore.transaction.oncomplete = function(event) {
       var customerObjectStore = db.transaction("contacts", "readwrite").objectStore("contacts");
@@ -34,7 +34,6 @@ function generateAll() {
         var contact = [];
         contact.push(
           Faker.Name.firstName(),
-          Faker.Name.lastName(),
           Faker.Name.lastName(),
           Faker.PhoneNumber.phoneNumber(),
           Faker.Internet.email(),
@@ -70,7 +69,7 @@ function search(str) {
 
   var results = [];
   var reStr = new RegExp(str, 'i');
-  var store = db.transaction("contacts") .objectStore("contacts");
+  var store = db.transaction("contacts").objectStore("contacts");
 
   function appendResult(res) {
     if (incrementalBtn.checked) {
