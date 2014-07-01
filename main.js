@@ -3,9 +3,10 @@ if (!window.indexedDB) {
 }
 
 var ctArray = [];
-(function generateContacts() {
-  console.log('Generating contacts and inserting them in database');
+function generateContacts() {
+  console.log('Generating contacts...');
 
+  ctArray = [];
   for (var i=0; i<2000; i++) {
     var ct = [];
     ct.push(
@@ -17,9 +18,14 @@ var ctArray = [];
     );
     ctArray.push(ct.join(' '));
   }
-  console.log(i + ' contacts inserted successfully.');
-})();
+  console.log(i + ' contacts generated successfully.');
+};
+generateContacts();
 
+document.getElementById('generateContacts')
+.addEventListener('click', function() {
+  generateContacts();
+});
 /////////
 
 var allText = [];
@@ -97,7 +103,9 @@ function search(str) {
       }
     }
     totalTime.textContent = Date.now() - time + 'ms';
-    contents.innerHTML += results.join('<br/>');
+    results.forEach(function(res) {
+      contents.innerHTML += '<li>' + res + '</li>';
+    });
     return;
   }
 
