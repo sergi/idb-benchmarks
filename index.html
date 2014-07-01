@@ -7,6 +7,12 @@
   <body>
     <input id="searchBox" type="text" />
     <label><input id="incremental" value="false" type="checkbox">Incremental Search</label><br>
+    <fieldset>
+      <legend>Method</legend>
+      <input type="radio" name="method" value="array" checked/>JS Array<br />
+      <input type="radio" name="method" value="indexeddb" />IndexedDB<br />
+    </fieldset>
+
     <button id="searchBtn">Search</button><br>
 
     <span>Total search time:</span><span id="totalTime" style="font-weight: bold"></span>

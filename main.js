@@ -2,19 +2,60 @@ if (!window.indexedDB) {
   window.alert("Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.");
 }
 
+var ctArray = [];
+(function generateContacts() {
+  console.log('Generating contacts and inserting them in database');
+
+  for (var i=0; i<2000; i++) {
+    var ct = [];
+    ct.push(
+      Faker.Name.firstName(),
+      Faker.Name.lastName(),
+      Faker.PhoneNumber.phoneNumber(),
+      Faker.Internet.email(),
+      Faker.Company.companyName()
+    );
+    ctArray.push(ct.join(' '));
+  }
+  console.log(i + ' contacts inserted successfully.');
+})();
+
+/////////
+
+var allText = [];
+var method;
+
+var radios = document.querySelectorAll('input[name="method"]');
+for(var i = 0, max = radios.length; i < max; i++) {
+  radios[i].onclick = function() {
+    resetDB();
+    method = this.value;
+  }
+
+  if (radios[i].checked) {
+    method = radios[i].value;
+  }
+}
+
 var db;
-var req = indexedDB.deleteDatabase('BenchDB');
-req.onsuccess = function () {
-  console.log("Deleted database successfully");
-  generateAll();
-};
-req.onerror = function () {
-  console.log("Couldn't delete database");
-  generateAll();
+function resetDB() {
+  var req = indexedDB.deleteDatabase('BenchDB');
+  req.onsuccess = function () {
+    console.log("Deleted database successfully");
+    generateAll();
+  };
+  req.onerror = function () {
+    console.log("Couldn't delete database");
+    generateAll();
+  }
 }
 
 function generateAll() {
-  console.log('Generating contacts and inserting them in database');
+
+  console.log(method)
+  if (method !== 'indexeddb') {
+    return;
+  }
 
   var request = window.indexedDB.open("BenchDB", 3);
 
@@ -29,37 +70,16 @@ function generateAll() {
     objectStore.createIndex("info", "info", { unique: false });
 
     objectStore.transaction.oncomplete = function(event) {
-      var customerObjectStore = db.transaction("contacts", "readwrite").objectStore("contacts");
-      for (var i=0; i<2000; i++) {
-        var contact = [];
-        contact.push(
-          Faker.Name.firstName(),
-          Faker.Name.lastName(),
-          Faker.PhoneNumber.phoneNumber(),
-          Faker.Internet.email(),
-          Faker.Company.companyName()
-        );
+      var customerObjectStore =
+        db.transaction("contacts", "readwrite").objectStore("contacts");
 
-        customerObjectStore.add({ info: contact.join(' ') });
+      for (var i = 0, l = ctArray.length; i < l; i ++) {
+        customerObjectStore.add({ info: ctArray[i] });
       }
       console.log(i + ' contacts inserted successfully.');
     };
   };
 }
-
-//function search(txt) {
-//var objectStore = db.transaction("contacts").objectStore("contacts");
-//var index = objectStore.index("info");
-//var lowerBoundKeyRange = IDBKeyRange.lowerBound(txt);
-//index.openCursor(lowerBoundKeyRange).onsuccess = function(event) {
-//var cursor = event.target.result;
-//if (cursor) {
-//console.log(cursor)
-//// Do something with the matches.
-//cursor.continue();
-//}
-//};
-//}
 
 var incrementalBtn = document.getElementById('incremental');
 var contents = document.getElementById('contents');
@@ -69,6 +89,19 @@ function search(str) {
   var time = Date.now();
 
   var results = [];
+  if (method === 'array') {
+    for (var i = 0, l = ctArray.length; i < l; i ++) {
+      var v = ctArray[i];
+
+      if (v.indexOf(str) !== -1) {
+        appendResult(v);
+      }
+    }
+    totalTime.textContent = Date.now() - time + 'ms';
+    document.getElementById('contents').innerHTML += results.join('<br/>');
+    return;
+  }
+
   //var reStr = new RegExp(str, 'i');
   var store = db.transaction("contacts").objectStore("contacts");
 
@@ -101,3 +134,6 @@ document.getElementById('searchBtn').addEventListener('click', function(ev) {
   document.getElementById('contents').innerHTML = '';
   search(document.getElementById('searchBox').value);
 });
+
+console.log('asdad');
+resetDB();
