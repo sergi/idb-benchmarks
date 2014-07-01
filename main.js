@@ -52,7 +52,6 @@ function resetDB() {
 
 function generateAll() {
 
-  console.log(method)
   if (method !== 'indexeddb') {
     return;
   }
@@ -98,7 +97,7 @@ function search(str) {
       }
     }
     totalTime.textContent = Date.now() - time + 'ms';
-    document.getElementById('contents').innerHTML += results.join('<br/>');
+    contents.innerHTML += results.join('<br/>');
     return;
   }
 
@@ -107,7 +106,7 @@ function search(str) {
 
   function appendResult(res) {
     if (incrementalBtn.checked) {
-      contents.innerHTML += res + '<br>';
+      contents.innerHTML += '<li>' + res + '</li>';
     } else {
       results.push(res);
     }
@@ -131,9 +130,8 @@ function search(str) {
 }
 
 document.getElementById('searchBtn').addEventListener('click', function(ev) {
-  document.getElementById('contents').innerHTML = '';
+  contents.innerHTML = '';
   search(document.getElementById('searchBox').value);
 });
 
-console.log('asdad');
 resetDB();
