@@ -1,0 +1,12 @@
+{
+  "name": "contacts-benchmark",
+  "description": "Benchmark different serach solutions for contacts",
+  "launch_path": "/index.html",
+  "developer": {
+    "name": "Sergi Mansilla",
+    "url": "http://sergimansilla.com"
+  },
+  "type": "web",
+  "permissions": {
+  }
+}
