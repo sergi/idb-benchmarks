@@ -18,9 +18,10 @@ function generateContacts() {
     );
     ctArray.push(ct.join(' '));
   }
+  searchBtn.disabled = false;
   console.log(i + ' contacts generated successfully.');
 };
-generateContacts();
+//generateContacts();
 
 document.getElementById('generateContacts')
 .addEventListener('click', function() {
