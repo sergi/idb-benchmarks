@@ -19,6 +19,7 @@ function generateContacts() {
     ctArray.push(ct.join(' '));
   }
   searchBtn.disabled = false;
+  resetDB();
   console.log(i + ' contacts generated successfully.');
 };
 //generateContacts();
@@ -87,13 +88,27 @@ function generateAll() {
   };
 }
 
-var incrementalBtn = document.getElementById('incremental');
 var contents = document.getElementById('contents');
 var totalTime = document.getElementById('totalTime');
 
+function fillContents(array) {
+    var frag = document.createDocumentFragment();
+    array.forEach(function(res) {
+      var li = document.createElement('li');
+      li.textContent = res;
+      frag.appendChild(li);
+    });
+    contents.appendChild(frag);
+}
 function search(str) {
   if (!ctArray || ctArray.length === 0) {
     alert('No contacts. Generate contacts first')
+    return;
+  }
+
+  var frag;
+  if (!str) {
+    fillContents(ctArray);
     return;
   }
 
@@ -105,40 +120,29 @@ function search(str) {
       var v = ctArray[i];
 
       if (v.indexOf(str) !== -1) {
-        appendResult(v);
+        results.push(v);
       }
     }
     totalTime.textContent = Date.now() - time + 'ms';
-    results.forEach(function(res) {
-      contents.innerHTML += '<li>' + res + '</li>';
-    });
+    fillContents(results);
     return;
   }
 
   //var reStr = new RegExp(str, 'i');
   var store = db.transaction("contacts").objectStore("contacts");
-
-  function appendResult(res) {
-    if (incrementalBtn.checked) {
-      contents.innerHTML += '<li>' + res + '</li>';
-    } else {
-      results.push(res);
-    }
-  }
-
   var index = store.index('info');
   var request = index.openCursor(IDBKeyRange.lowerBound(0), 'next');
+
   request.onsuccess = function(evt) {
     var cursor = request.result;
     if (cursor) {
-      //if (reStr.test(cursor.value.info)) {
       if (cursor.value.info.indexOf(str) !== -1) {
-        appendResult(cursor.value.info);
+        results.push(cursor.value.info);
       }
       cursor.continue();
     } else {
       totalTime.textContent = Date.now() - time + 'ms';
-      document.getElementById('contents').innerHTML += results.join('<br/>');
+      fillContents(results);
     }
   };
 }
