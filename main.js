@@ -16,10 +16,11 @@ function generateContacts() {
       Faker.Internet.email(),
       Faker.Company.companyName()
     );
-    ctArray.push(ct.join(' '));
+    ctArray.push(btoa(ct.join(' ')));
   }
   searchBtn.disabled = false;
   resetDB();
+  //console.log(ctArray.join('\n'));
   console.log(i + ' contacts generated successfully.');
 };
 //generateContacts();
@@ -119,7 +120,7 @@ function search(str) {
     for (var i=0, l=ctArray.length; i < l; i ++) {
       var v = ctArray[i];
       if (v.indexOf(str) !== -1) {
-        results.push(v);
+        results.push(atob(v));
       }
     }
 
@@ -138,7 +139,7 @@ function search(str) {
     var cursor = request.result;
     if (cursor) {
       if (cursor.value.info.indexOf(str) !== -1) {
-        results.push(cursor.value.info);
+        results.push(atob(cursor.value.info));
       }
       cursor.continue();
     } else {
@@ -148,8 +149,8 @@ function search(str) {
   };
 }
 
-  document.getElementById('searchBtn').addEventListener('click', function(ev) {
-    contents.innerHTML = '';
-    search(document.getElementById('searchBox').value);
-  });
+document.getElementById('searchBtn').addEventListener('click', function(ev) {
+  contents.innerHTML = '';
+  search(btoa(document.getElementById('searchBox').value));
+});
 
