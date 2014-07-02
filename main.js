@@ -83,6 +83,7 @@ function generateAll() {
       for (var i = 0, l = ctArray.length; i < l; i ++) {
         customerObjectStore.add({ info: ctArray[i] });
       }
+      ctArray = [];
       console.log(i + ' contacts inserted successfully.');
     };
   };
@@ -92,21 +93,15 @@ var contents = document.getElementById('contents');
 var totalTime = document.getElementById('totalTime');
 
 function fillContents(array) {
-    var frag = document.createDocumentFragment();
-    array.forEach(function(res) {
-      var li = document.createElement('li');
-      li.textContent = res;
-      frag.appendChild(li);
-    });
-    contents.appendChild(frag);
+  var frag = document.createDocumentFragment();
+  array.forEach(function(res) {
+    var li = document.createElement('li');
+    li.textContent = res;
+    frag.appendChild(li);
+  });
+  contents.appendChild(frag);
 }
 function search(str) {
-  if (!ctArray || ctArray.length === 0) {
-    alert('No contacts. Generate contacts first')
-    return;
-  }
-
-  var frag;
   if (!str) {
     fillContents(ctArray);
     return;
@@ -116,20 +111,26 @@ function search(str) {
 
   var results = [];
   if (method === 'array') {
-    for (var i = 0, l = ctArray.length; i < l; i ++) {
-      var v = ctArray[i];
+    if (!ctArray || ctArray.length === 0) {
+      alert('No contacts. Generate contacts first');
+      return;
+    }
 
+    for (var i=0, l=ctArray.length; i < l; i ++) {
+      var v = ctArray[i];
       if (v.indexOf(str) !== -1) {
         results.push(v);
       }
     }
+
     totalTime.textContent = Date.now() - time + 'ms';
     fillContents(results);
     return;
   }
 
-  //var reStr = new RegExp(str, 'i');
-  var store = db.transaction("contacts").objectStore("contacts");
+  var transaction = db.transaction("contacts", 'readonly');
+  var store = transaction.objectStore("contacts");
+
   var index = store.index('info');
   var request = index.openCursor(IDBKeyRange.lowerBound(0), 'next');
 
@@ -147,9 +148,8 @@ function search(str) {
   };
 }
 
-document.getElementById('searchBtn').addEventListener('click', function(ev) {
-  contents.innerHTML = '';
-  search(document.getElementById('searchBox').value);
-});
+  document.getElementById('searchBtn').addEventListener('click', function(ev) {
+    contents.innerHTML = '';
+    search(document.getElementById('searchBox').value);
+  });
 
-resetDB();
