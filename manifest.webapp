@@ -8,5 +8,6 @@
   },
   "type": "web",
   "permissions": {
-  }
+  },
+  "version": "0.0.1"
 }

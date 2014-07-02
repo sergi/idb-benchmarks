@@ -92,6 +92,11 @@ var contents = document.getElementById('contents');
 var totalTime = document.getElementById('totalTime');
 
 function search(str) {
+  if (!ctArray || ctArray.length === 0) {
+    alert('No contacts. Generate contacts first')
+    return;
+  }
+
   var time = Date.now();
 
   var results = [];
