@@ -21,20 +21,6 @@ function generateContacts() {
   });
 }
 
-generateContactsBtn.addEventListener('click', generateContacts);
-
-var method;
-var radios = document.querySelectorAll('input[name="method"]');
-for(var i = 0, max = radios.length; i < max; i++) {
-  radios[i].onclick = function() {
-    method = this.value;
-  };
-
-  if (radios[i].checked) {
-    method = radios[i].value;
-  }
-}
-
 var db;
 function resetDB(cb) {
   var req = indexedDB.deleteDatabase('BenchDB');
@@ -76,14 +62,27 @@ function insertContactsInDB(cb) {
   };
 }
 
-function populateList(array) {
-  var frag = document.createDocumentFragment();
-  for (var i = 0, l = array.length; i < l; i ++) {
-    var li = document.createElement('li');
-    li.textContent = array[i];
-    frag.appendChild(li);
-    contents.appendChild(frag);
-  }
+function searchIndexedDB(str) {
+  var results = [];
+
+  var transaction = db.transaction("contacts", 'readonly');
+  var store = transaction.objectStore("contacts");
+  var index = store.index('info');
+  var request = index.openCursor(IDBKeyRange.lowerBound(0), 'next');
+
+  var time = Date.now();
+  request.onsuccess = function(evt) {
+    var cursor = request.result;
+    if (cursor) {
+      if (cursor.value.info.indexOf(str) !== -1) {
+        results.push(cursor.value.info);
+      }
+      cursor.continue();
+    } else {
+      totalTime.textContent = Date.now() - time + 'ms';
+      populateList(results);
+    }
+  };
 }
 
 function search(str) {
@@ -101,29 +100,31 @@ function search(str) {
   }
 }
 
-function searchIndexedDB(str) {
-  var results = [];
-  var time = Date.now();
+// DOM manipulation, listeners, etc.
 
-  var transaction = db.transaction("contacts", 'readonly');
-  var store = transaction.objectStore("contacts");
-  var index = store.index('info');
-  var request = index.openCursor(IDBKeyRange.lowerBound(0), 'next');
-
-  request.onsuccess = function(evt) {
-    var cursor = request.result;
-    if (cursor) {
-      if (cursor.value.info.indexOf(str) !== -1) {
-        results.push(cursor.value.info);
-      }
-      cursor.continue();
-    } else {
-      totalTime.textContent = Date.now() - time + 'ms';
-      populateList(results);
-    }
-  };
+function populateList(array) {
+  var frag = document.createDocumentFragment();
+  for (var i = 0, l = array.length; i < l; i ++) {
+    var li = document.createElement('li');
+    li.textContent = array[i];
+    frag.appendChild(li);
+    contents.appendChild(frag);
+  }
 }
 
+generateContactsBtn.addEventListener('click', generateContacts);
+
+var method;
+var radios = document.querySelectorAll('input[name="method"]');
+for(var i = 0, max = radios.length; i < max; i++) {
+  radios[i].onclick = function() {
+    method = this.value;
+  };
+
+  if (radios[i].checked) {
+    method = radios[i].value;
+  }
+}
 searchBtn.addEventListener('click', function(ev) {
   contents.innerHTML = '';
   search(searchBox.value);
